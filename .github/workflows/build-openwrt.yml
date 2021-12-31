@@ -207,8 +207,8 @@ jobs:
         SW_FLOWOFFLOAD: 0
         HW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
-        SELECT_PACKITPATH: openwrt_packit
-        SELECT_OUTPUTPATH: output
+         echo "PACKAGED_OUTPUTPATH=${PWD}/output" >> $GITHUB_ENV
+         echo "::set-output name=status::success"
         
 #    - name: copy update files
 #      run: |
