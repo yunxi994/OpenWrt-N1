@@ -35,7 +35,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
@@ -47,7 +47,7 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
+        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -178,7 +178,7 @@ jobs:
       uses: GitRML/delete-workflow-runs@main
       with:
         retain_days: 1
-        keep_minimum_runs: 3
+        keep_minimum_runs: 6
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@v0.1.0
@@ -191,4 +191,48 @@ jobs:
 
     - name: Telegram notification
       if: steps.organize.outputs.status == 'success' && !cancelled()
-      run: curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${{ steps.tag.outputs.release_tag }}😀😀😀编译完成啦😀😀😀" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+      run: curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${{ steps.tag.outputs.release_tag }}😀😀😀Self use编译完成啦😀😀😀" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+
+
+    - name: Package Armvirt as OpenWrt
+      uses: unifreq/openwrt_packit@master
+      env:
+        OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
+        PACKAGE_SOC: s905d_s905x3_s922x_vplus_beikeyun_l1pro_s912
+        KERNEL_AUTO_LATEST:  true
+        KERNEL_VERSION_NAME: 5.4.168_5.10.88_5.15.11
+        WHOAMI: Yuan
+        ENABLE_WIFI_K504: 0
+        ENABLE_WIFI_K510: 0
+        SW_FLOWOFFLOAD: 0
+        HW_FLOWOFFLOAD: 0
+        SFE_FLOW: 0
+        SELECT_PACKITPATH: openwrt_packit
+        SELECT_OUTPUTPATH: output
+        
+#    - name: copy update files
+#      run: |
+#        cd /opt/openwrt_packit
+#        sudo cp files/scripts_deprecated/update-amlogic-openwrt.sh output/update-amlogic-openwrt.sh
+        
+    - name: Upload OpenWrt Firmware to Release
+      uses: ncipollo/release-action@v1
+      with:
+         allowUpdates: true
+         removeArtifacts: true
+         tag: Selfuse_OpenWrt_${{ env.PACKAGED_OUTPUTDATE }}
+         token: ${{ secrets.GITHUB_TOKEN }}
+         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+         body: |
+           This is OpenWrt firmware for Armvirt 64
+           * Firmware information
+           自用固件，插件根据个人需要.
+        
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.1.0
+      with:
+         keep_latest: 3
+         delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
