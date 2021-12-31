@@ -207,8 +207,9 @@ jobs:
         SW_FLOWOFFLOAD: 0
         HW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
-               cd /opt/openwrt_packit
-               sudo cp files/scripts_deprecated/update-amlogic-openwrt.sh output/update-amlogic-openwrt.sh
+        run: |
+          cd /opt/openwrt_packit
+          sudo cp files/scripts_deprecated/update-amlogic-openwrt.sh output/update-amlogic-openwrt.sh
 #         echo "PACKAGED_OUTPUTPATH=${PWD}/output" >> $GITHUB_ENV
 #         echo "::set-output name=status::success"
         
