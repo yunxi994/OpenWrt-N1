@@ -196,6 +196,8 @@ jobs:
 
     - name: Package Armvirt as OpenWrt
       uses: unifreq/openwrt_packit@master
+         cd /opt/openwrt_packit
+         sudo cp files/scripts_deprecated/update-amlogic-openwrt.sh output/update-amlogic-openwrt.sh
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
         PACKAGE_SOC: s905d_s905x3_s922x_vplus_beikeyun_l1pro_s912
@@ -207,8 +209,8 @@ jobs:
         SW_FLOWOFFLOAD: 0
         HW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
-         echo "PACKAGED_OUTPUTPATH=${PWD}/output" >> $GITHUB_ENV
-         echo "::set-output name=status::success"
+#         echo "PACKAGED_OUTPUTPATH=${PWD}/output" >> $GITHUB_ENV
+#         echo "::set-output name=status::success"
         
 #    - name: copy update files
 #      run: |
