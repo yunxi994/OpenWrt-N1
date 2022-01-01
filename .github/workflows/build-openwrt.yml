@@ -194,9 +194,12 @@ jobs:
       run: curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${{ steps.tag.outputs.release_tag }}😀😀😀Self use编译完成啦😀😀😀" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
 
+    - name: copy update files
+      run: |
+        mv -t /output /opt/openwrt_packit/files/scripts_deprecated/update-amlogic-openwrt.sh
+
     - name: Package Armvirt as OpenWrt
       uses: unifreq/openwrt_packit@master
-         mv -t /output /opt/openwrt_packit/files/scripts_deprecated/update-amlogic-openwrt.sh
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
         PACKAGE_SOC: s905d_s905x3_s922x_vplus_beikeyun_l1pro_s912
