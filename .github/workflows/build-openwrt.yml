@@ -177,7 +177,7 @@ jobs:
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
       with:
-        retain_days: 1
+        retain_days: 2
         keep_minimum_runs: 6
 
     - name: Remove old Releases
@@ -194,16 +194,6 @@ jobs:
       run: curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${{ steps.tag.outputs.release_tag }}😀😀😀Self use编译完成啦😀😀😀" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
 
-    - name: Create a folder
-      run: |
-        cd /opt/openwrt_packit
-        mkdir output
-        
-    - name: copy update files
-      run: |
-        cd /opt/openwrt_packit
-        sudo cp files/scripts_deprecated/update-amlogic-openwrt.sh output/update-amlogic-openwrt.sh
-        
     - name: Package Armvirt as OpenWrt
       uses: unifreq/openwrt_packit@master
       env:
@@ -217,6 +207,14 @@ jobs:
         SW_FLOWOFFLOAD: 0
         HW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
+        SELECT_PACKITPATH: openwrt_packit
+        SELECT_OUTPUTPATH: output
+        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+        
+    - name: copy update files
+      run: |
+        cd /opt/openwrt_packit
+        sudo cp files/scripts_deprecated/update-amlogic-openwrt.sh output/update-amlogic-openwrt.sh
         
     - name: Upload OpenWrt Firmware to Release
       uses: ncipollo/release-action@v1
@@ -229,12 +227,14 @@ jobs:
          body: |
            This is OpenWrt firmware for Armvirt 64
            * Firmware information
-           自用固件，插件根据个人需要.
+           * 自用固件，插件根据个人需要.
+           * 默认IP: 192.168.1.1
+           * 默认密码: password
         
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@v0.1.0
       with:
-         keep_latest: 3
+         keep_latest: 4
          delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
